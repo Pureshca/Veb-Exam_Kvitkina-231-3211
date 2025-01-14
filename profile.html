@@ -97,6 +97,32 @@
     </div>
 
     <script>
+function calculateDeliveryCost(deliveryDate, deliveryTime) {
+    // Преобразуем строку "ДД.ММ.ГГГГ" в объект Date
+    const [day, month, year] = deliveryDate.split('.');
+    const formattedDate = new Date(`${year}-${month}-${day}`);
+    const deliveryDay = formattedDate.getDay(); // Получаем день недели из даты доставки (0 - воскресенье, 1 - понедельник и т.д.)
+
+    let deliveryCost = 200; // Базовая стоимость доставки
+    
+    // Если это выходной день
+    if (deliveryDay === 6 || deliveryDay === 0) {
+        deliveryCost += 300; // Добавляем 300 за выходной день
+    }
+
+    console.log(deliveryTime); // Для отладки вывода даты
+    // Если доставка вечером в будний день
+    if (deliveryTime === 'Вечер') {
+        deliveryCost += 200; // Добавляем 200 за вечернюю доставку
+        console.log(deliveryTime); // Для отладки вывода даты
+    }
+
+    return deliveryCost;
+}
+
+
+
+
     function renderOrders() {
         const ordersList = document.getElementById('orders-list');
         const orders = JSON.parse(localStorage.getItem('orders')) || [];
@@ -118,19 +144,24 @@
         });
 
         orders.forEach((order, index) => {
+            // Получаем стоимость доставки
+            const [deliveryDate, deliveryTime] = order.delivery.split(' '); // Разделяем дату и время
+            const deliveryCost = calculateDeliveryCost(deliveryDate, deliveryTime); // Передаем оба параметра
+            const totalCost = parseFloat(order.total);
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${index + 1}</td>
                 <td>${order.date}</td>
                 <td>${order.items}</td>
-                <td>${order.total}</td>
-                <td>${order.delivery}</td>
+                <td>${totalCost + deliveryCost} руб.</td> <!-- Обновленная стоимость -->
+                <td>${order.delivery}</td> <!-- Показ стоимости доставки -->
                 <td>
                     <button onclick="openModal('view-modal', ${order.id})">Просмотр</button>
                     <button onclick="openModal('edit-modal', ${order.id})">Редактирование</button>
                     <button onclick="openModal('delete-modal', ${order.id})">Удаление</button>
                 </td>
             `;
+            console.log(totalCost);
             ordersList.appendChild(row);
         });
     }
@@ -154,11 +185,13 @@
     const order = orders.find(order => order.id === orderId);
 
     if (modalId === 'view-modal') {
+        const [deliveryDate, deliveryTime] = order.delivery.split(' '); // Разделяем дату и время
+            const deliveryCost = calculateDeliveryCost(deliveryDate, deliveryTime); // Передаем оба параметра
         // В модальном окне "Просмотр" показываем информацию о заказе
         document.getElementById('view-content').innerText = `Заказ #${order.id}: 
                 Время заказа: ${order.date}
                 Товары: ${order.items}
-                Стоимость: ${order.total}
+                Стоимость: ${order.total} + ${deliveryCost} руб.
                 Доставка: ${order.delivery}
                 Комментарий: ${order.comment}`;
 
