@@ -71,7 +71,7 @@
         <p>Email: <a href="mailto:info@example.com">marusam263@gmail.com</a></p>
         <p>© 2025 Интернет-магазин. Контакты: info@example.com</p>
     </footer>
-
+    <!--
     <script>
         const catalog = document.getElementById('catalog');
         const searchInput = document.getElementById('search-input');
@@ -104,41 +104,41 @@
         }
 
         // Функция для отображения товаров на текущей странице
-function renderProducts() {
-    const start = (currentPage - 1) * productsPerPage;
-    const end = currentPage * productsPerPage;
-    const pageProducts = filteredProducts.slice(start, end); // Товары на текущей странице
+        function renderProducts() {
+            const start = (currentPage - 1) * productsPerPage;
+            const end = currentPage * productsPerPage;
+            const pageProducts = filteredProducts.slice(start, end); // Товары на текущей странице
 
-    // Добавляем товары, а не заменяем их
-    pageProducts.forEach(product => {
-        const productCard = document.createElement('div');
-        productCard.className = 'product-card';
-        productCard.innerHTML = `
-            <img src="${product.image_url}" alt="${product.name}">
-            <h2>${product.name}</h2>
-            <p>Рейтинг: ${product.rating}</p>
-            <p class="price">Цена: ${product.discount_price ? `<s class="original-price">${product.actual_price} руб.</s> <span class="discounted-price">${product.discount_price} руб.</span>` : `${product.actual_price} руб.`}</p>
-            <button class="add-to-cart" data-id="${product.id}">Добавить в корзину</button>
-        `;
-        catalog.appendChild(productCard);
-    });
+            // Добавляем товары, а не заменяем их
+            pageProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <img src="${product.image_url}" alt="${product.name}">
+                    <h2>${product.name}</h2>
+                    <p>Рейтинг: ${product.rating}</p>
+                    <p class="price">Цена: ${product.discount_price ? `<s class="original-price">${product.actual_price} руб.</s> <span class="discounted-price">${product.discount_price} руб.</span>` : `${product.actual_price} руб.`}</p>
+                    <button class="add-to-cart" data-id="${product.id}">Добавить в корзину</button>
+                `;
+                catalog.appendChild(productCard);
+            });
 
-    // Добавляем обработчик событий для кнопок "Добавить в корзину"
-    document.querySelectorAll('.add-to-cart').forEach(button => {
-        button.addEventListener('click', (event) => {
-            const productId = event.target.dataset.id;
-            const product = products.find(p => p.id == productId);
-            addToCart(product);  // Функция добавления товара в корзину
-        });
-    });
+            // Добавляем обработчик событий для кнопок "Добавить в корзину"
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const productId = event.target.dataset.id;
+                    const product = products.find(p => p.id == productId);
+                    addToCart(product);  // Функция добавления товара в корзину
+                });
+            });
 
-    // Если товаров осталось меньше, чем 10, скрыть кнопку "Загрузить ещё"
-    if (end >= filteredProducts.length) {
-        document.getElementById('load-more').style.display = 'none';
-    } else {
-        document.getElementById('load-more').style.display = 'block';
-    }
-}
+            // Если товаров осталось меньше, чем 10, скрыть кнопку "Загрузить ещё"
+            if (end >= filteredProducts.length) {
+                document.getElementById('load-more').style.display = 'none';
+            } else {
+                document.getElementById('load-more').style.display = 'block';
+            }
+        }
 
 
         // Обработчик для кнопки "Загрузить ещё"
@@ -261,19 +261,19 @@ function renderProducts() {
                 image: product.image_url,  // Картинка товара
                 rating: product.rating  // Рейтинг товара
             };
-    cart.push(productToAdd);
-    localStorage.setItem('cart', JSON.stringify(cart));
+        cart.push(productToAdd);
+        localStorage.setItem('cart', JSON.stringify(cart));
 
-    // Показываем уведомление
-    const notification = document.getElementById('notification');
-    notification.style.display = 'block';
+        // Показываем уведомление
+        const notification = document.getElementById('notification');
+        notification.style.display = 'block';
 
-    // Закрыть уведомление через клик
-    document.getElementById('close-notification').addEventListener('click', () => {
-        notification.style.display = 'none';
-    });
-}
-
-    </script>
+        // Закрыть уведомление через клик
+        document.getElementById('close-notification').addEventListener('click', () => {
+            notification.style.display = 'none';
+        });
+    }
+    </script>-->
+    <script src=script.js></script>
 </body>
 </html>

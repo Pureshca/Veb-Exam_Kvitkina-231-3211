@@ -324,6 +324,7 @@ footer a:hover {
     margin-bottom: 20px;
 }
 
+/* Стиль для таблицы */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -332,12 +333,14 @@ table {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Стиль для заголовков и ячеек */
 th, td {
     padding: 15px;
     text-align: center;
     border: 1px solid #ddd;
 }
 
+/* Стиль для заголовков */
 th {
     background-color: #613561;
     color: white;
@@ -346,6 +349,65 @@ th {
 td {
     background-color: #fff;
 }
+
+/* Стили для кнопок в таблице */
+td button {
+    padding: 8px 16px;
+    background-color: #613561;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+td button:hover {
+    background-color: #ffee00;
+}
+
+td button:active {
+    transform: scale(0.98);
+}
+
+/* Адаптивность для маленьких экранов */
+@media (max-width: 768px) {
+    /* Делаем таблицу прокручиваемой, если экран слишком узкий */
+    table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Уменьшаем отступы и шрифт */
+    th, td {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    /* Меняем стиль заголовков, чтобы они помещались на маленьких экранах */
+    th {
+        font-size: 1rem;
+        white-space: nowrap;
+    }
+
+    td {
+        font-size: 0.9rem;
+    }
+}
+
+/* Адаптивность для экранов меньших размеров */
+@media (max-width: 480px) {
+    th, td {
+        padding: 8px;
+        font-size: 0.8rem;
+    }
+
+    /* Дополнительно можно уменьшить таблицу */
+    table {
+        width: 100%;
+    }
+}
+
 
 td button {
     padding: 8px 16px;
