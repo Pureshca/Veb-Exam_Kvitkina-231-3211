@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Магазин</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
+    <style>
+        .cart {
+            margin-bottom: 30px;
+        }
+
+        .checkout {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+
+        .checkout h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .user-data, .delivery-data {
+            width: 48%;
+        }
+
+        .user-data label, .delivery-data label {
+            display: block;
+            margin: 12px 0 6px;
+            color: #555;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        button {
+            background: #66115f;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 18px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #ffeb3b;
+        }
+        /* Стили для пустой корзины */
+        #empty-cart-message {
+            text-align: center;
+            color: #888;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="Логотип" class="logo">
+        <div class="logo">Магазин</div>
+        <div class="links">
+            <a href="index.html">Каталог</a>
+            <a href="profile.html">Личный кабинет</a>
+        </div>
+    </header>
+
+    <div id="notification" class="notification">
+        Заказ оформлен!<span id="close-notification" class="close-notification">X</span>
+    </div>
+
+    <div class="container">
+        <div class="cart">
+            <h1>Корзина</h1>
+            <div class="catalog" id="cart-catalog">
+                <!-- Товары будут добавлены динамически -->
+            </div>
+            <p id="empty-cart-message" style="display: none;">Корзина пуста. Перейдите в каталог, чтобы добавить товары.</p>
+        </div>
+    </div>
+        
+    <div class="checkout">
+        <h2>Оформление заказа</h2>
+        <form id="checkout-form">
+            <div class="form-container">
+                <div class="user-data">
+                    <h3>Данные пользователя</h3>
+                    <label>Имя<input type="text" name="name" required></label>
+                    <label>Email<input type="email" name="email" required></label>
+                    <label>Телефон<input type="text" name="phone" required></label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="newsletter"> Согласие на получение рассылки
+                    </label>                        
+                </div>
+
+                <div class="delivery-data">
+                    <h3>Данные для доставки</h3>
+                    <label>Адрес доставки<input type="text" name="address" required></label>
+                    <label>Дата доставки<input type="date" name="delivery-date" required></label>
+                    <label>Временной интервал доставки
+                        <select name="delivery-time">
+                            <option value="morning">Утро</option>
+                            <option value="afternoon">День</option>
+                            <option value="evening">Вечер</option>
+                        </select>
+                    </label>
+                    <label>Комментарий к заказу<textarea name="comment"></textarea></label>
+                </div>
+            </div>
+            <div class="checkout-total">
+                <p><strong>Итоговая стоимость:</strong> <span id="total-price">0 руб.</span></p>
+            </div>
+            
+            <button type="submit">Оформить заказ</button>
+            <button type="button" id="reset-cart">Сбросить</button>
+
+        </form>
+    </div>
+
+    <footer>
+        <p>Контактные данные:</p>
+        <p>Квиткина Ульяна 231-3211</p>
+        <p>Телефон: <a href="tel:+79991234567">+7 (920) 454-43-88</a></p>
+        <p>Email: <a href="mailto:info@example.com">marusam263@gmail.com</a></p>
+        <p>© 2025 Интернет-магазин. Контакты: info@example.com</p>
+    </footer>
+
+    <script>
+        const cartCatalog = document.getElementById('cart-catalog');
+        const emptyCartMessage = document.getElementById('empty-cart-message');
+
+        function calculateShippingCost() {
+            const deliveryDate = document.querySelector('input[name="delivery-date"]').value;
+            const deliveryTime = document.querySelector('select[name="delivery-time"]').value;
+            const today = new Date();
+            const selectedDate = new Date(deliveryDate);
+            
+            let shippingCost = 200; // Базовая стоимость доставки
+
+            // Проверка, является ли выбранный день выходным
+            const isWeekend = selectedDate.getDay() === 6 || selectedDate.getDay() === 0; // Суббота (6) или Воскресенье (0)
+
+            // Проверка, если день выбран в вечернее время
+            const isEvening = deliveryTime === 'evening';
+
+            // Добавляем стоимость в зависимости от времени суток или выходного дня
+            if (isEvening) {
+                shippingCost += 200; // Вечернее время в будние дни
+            } if (isWeekend) {
+                shippingCost += 300; // Выходные дни
+            }
+
+            return shippingCost;
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cart.length === 0) {
+                emptyCartMessage.style.display = 'block';
+                cartCatalog.innerHTML = '';
+                document.getElementById('total-price').innerText = '0 руб.'; // Обновляем итоговую стоимость
+            } else {
+                emptyCartMessage.style.display = 'none';
+                cartCatalog.innerHTML = '';
+                let totalPrice = 0; // Переменная для расчета итоговой стоимости
+                cart.forEach((item, index) => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card';
+                    productCard.innerHTML =  
+                        `<img src="${item.image}" alt="${item.name}">
+                         <h2>${item.name}</h2>
+                         <p>Рейтинг: ${item.rating}</p>
+                         <p>Цена: ${item.discount ? `<s>${item.price * 1.2} руб.</s> ${item.price} руб.` : `${item.price} руб.`}</p>
+                         <button class="remove-from-cart" data-index="${index}">Удалить</button>`;
+                    cartCatalog.appendChild(productCard);
+                    totalPrice += item.price; // Добавляем цену товара к общей стоимости
+                });
+
+                // Рассчитываем стоимость доставки
+                const shippingCost = calculateShippingCost();
+                totalPrice += shippingCost; // Прибавляем к общей стоимости
+
+                // Обновляем итоговую стоимость
+                document.getElementById('total-price').innerText = `${totalPrice} руб. (Доставка: ${shippingCost} руб.)`;
+
+                document.querySelectorAll('.remove-from-cart').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const index = parseInt(event.target.dataset.index);
+                        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                        cart.splice(index, 1);
+                        localStorage.setItem('cart', JSON.stringify(cart));
+                        renderCart(); // Перерисовываем корзину после удаления
+                    });
+                });
+            }
+        }
+
+        // Слушаем изменения в поле даты и времени
+        document.querySelector('input[name="delivery-date"]').addEventListener('change', renderCart);
+        document.querySelector('select[name="delivery-time"]').addEventListener('change', renderCart);
+
+        renderCart(); // Перерисовываем корзину при загрузке страницы
+
+        document.getElementById('checkout-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            
+            // Собираем данные о пользователе
+            const userData = {
+                name: this['name'].value,
+                email: this['email'].value,
+                phone: this['phone'].value,
+                address: this['address'].value,
+                newsletter: this['newsletter'].checked,
+            };
+
+            const order = {
+                id: Date.now(),
+                date: new Date().toLocaleString(),
+                items: cart.map(item => item.name).join(', '),
+                total: cart.reduce((sum, item) => sum + item.price, 0) + ' руб.',
+                delivery: `${this['delivery-date'].value} ${this['delivery-time'].options[this['delivery-time'].selectedIndex].text}`,
+                comment: this['comment'].value,  // Добавляем комментарий
+                user: userData
+            };
+
+            // Сохраняем заказ в localStorage
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+
+            // Очистить корзину
+            localStorage.setItem('cart', JSON.stringify([]));
+
+            // Показываем уведомление
+            const notification = document.getElementById('notification');
+            notification.style.display = 'block';
+
+            // Закрытие уведомления по клику на крестик
+            document.getElementById('close-notification').addEventListener('click', () => {
+                notification.style.display = 'none';
+            });
+            renderCart();
+        });
+
+        document.getElementById('reset-cart').addEventListener('click', function() {
+            // Очистка корзины в localStorage
+            localStorage.setItem('cart', JSON.stringify([]));
+            
+            // Очистка формы
+            document.getElementById('checkout-form').reset();
+            
+            // Обновление интерфейса (перерисовываем корзину)
+            renderCart();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Магазин</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="Логотип" class="logo">
+        <div class="logo">Магазин</div>
+        <div class="links">
+            <a href="index.html">Каталог</a>
+            <a href="cart.html">Корзина</a>
+        </div>
+    </header>
+
+    <div id="notification" class="notification">
+        Заказ изменен!<span id="close-notification" class="close-notification">X</span> 
+    </div>
+
+    <div class="orders">
+        <h1>Заказы</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Дата</th>
+                    <th>Состав</th>
+                    <th>Стоимость</th>
+                    <th>Доставка</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="orders-list">
+                <!-- Динамически добавляемые строки -->
+            </tbody>
+        </table>
+    </div>
+
+    <footer class="footer">
+        <p>Контактные данные:</p>
+        <p>Квиткина Ульяна 231-3211</p>
+        <p>Телефон: <a href="tel:+79991234567">+7 (920) 454-43-88</a></p>
+        <p>Email: <a href="mailto:info@example.com">marusam263@gmail.com</a></p>
+        <p>© 2025 Интернет-магазин. Контакты: info@example.com</p>
+    </footer>
+
+    <!-- Модальные окна -->
+    <div class="modal" id="view-modal">
+        <div class="modal-content">
+            <h2>Просмотр заказа</h2>
+            <h3>Информация о заказе</h3>
+            <p id="view-content">Заказ</p>
+            <h3>Информация о пользователе</h3>
+            <p id="view-user">Данные пользователя</p> <!-- Добавляем информацию о пользователе -->
+            <button onclick="closeModal('view-modal')">Закрыть</button>
+        </div>
+    </div>
+
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <h2>Редактирование заказа</h2>
+            <form id="edit-form">
+                <label>Имя<input type="text" name="name" required></label>
+                <label>Email<input type="email" name="email" required></label>
+                <label>Телефон<input type="text" name="phone" required></label>
+                <label>Адрес доставки<input type="text" name="address" required></label>
+                <label>Дата доставки<input type="date" name="delivery-date" required></label>
+                <label>Время доставки
+                    <select name="delivery-time">
+                        <option value="morning">Утро</option>
+                        <option value="afternoon">День</option>
+                        <option value="evening">Вечер</option>
+                    </select>
+                </label>
+                <label>Комментарий<textarea name="comment"></textarea></label>
+
+                <button type="submit">Сохранить изменения</button>
+            </form>
+            <button onclick="closeModal('edit-modal')">Закрыть</button>
+        </div>
+    </div>
+    
+
+    <div class="modal" id="delete-modal">
+        <div class="modal-content">
+            <h2>Удаление заказа</h2>
+            <p>Вы уверены, что хотите удалить этот заказ?</p>
+            <button onclick="closeModal('delete-modal')">Отмена</button>
+            <button onclick="confirmDelete()">Удалить</button>
+        </div>
+    </div>
+
+    <script>
+    function renderOrders() {
+        const ordersList = document.getElementById('orders-list');
+        const orders = JSON.parse(localStorage.getItem('orders')) || [];
+        console.log('Orders:', orders); // Логируем содержимое orders
+        ordersList.innerHTML = '';
+
+        if (orders.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td colspan="6">Нет заказов</td>`;
+            ordersList.appendChild(row);
+            return;
+        }
+
+        // Сортировка заказов по дате (от новых к старым)
+        orders.sort((a, b) => {
+            const dateA = convertDate(a.date);
+            const dateB = convertDate(b.date);
+            return dateB - dateA;
+        });
+
+        orders.forEach((order, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${order.date}</td>
+                <td>${order.items}</td>
+                <td>${order.total}</td>
+                <td>${order.delivery}</td>
+                <td>
+                    <button onclick="openModal('view-modal', ${order.id})">Просмотр</button>
+                    <button onclick="openModal('edit-modal', ${order.id})">Редактирование</button>
+                    <button onclick="openModal('delete-modal', ${order.id})">Удаление</button>
+                </td>
+            `;
+            ordersList.appendChild(row);
+        });
+    }
+
+    // Функция для конвертации даты из формата "14.01.2025, 09:22:19" в объект Date
+    function convertDate(dateString) {
+        const [datePart, timePart] = dateString.split(', ');
+        const [day, month, year] = datePart.split('.');
+        return new Date(`${year}-${month}-${day}T${timePart}`);
+    }
+
+
+
+    function openModal(modalId, orderId) {
+    // Открываем соответствующее модальное окно
+    document.getElementById(modalId).style.display = 'flex';
+
+    // Получаем список заказов из localStorage
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    // Находим заказ по его ID
+    const order = orders.find(order => order.id === orderId);
+
+    if (modalId === 'view-modal') {
+        // В модальном окне "Просмотр" показываем информацию о заказе
+        document.getElementById('view-content').innerText = `Заказ #${order.id}: 
+                Время заказа: ${order.date}
+                Товары: ${order.items}
+                Стоимость: ${order.total}
+                Доставка: ${order.delivery}
+                Комментарий: ${order.comment}`;
+
+        // Также показываем информацию о пользователе
+        document.getElementById('view-user').innerText = `Имя: ${order.user.name}
+                Email: ${order.user.email}
+                Телефон: ${order.user.phone}
+                Адрес доставки: ${order.user.address}`;
+    }
+
+    if (modalId === 'edit-modal') {
+        const form = document.getElementById('edit-form');
+        form['name'].value = order.user.name;
+        form['email'].value = order.user.email;
+        form['phone'].value = order.user.phone;
+        form['address'].value = order.user.address;
+        form['comment'].value = order.comment;
+
+        // Разделяем доставку на дату и временной интервал
+        const [deliveryDate, deliveryTime] = order.delivery.split(' ');
+        form['delivery-date'].value = deliveryDate;
+
+        // Устанавливаем значение временного интервала
+        const timeOption = Array.from(form['delivery-time'].options).find(option => option.text === deliveryTime);
+        if (timeOption) {
+            form['delivery-time'].value = timeOption.value;
+        }
+
+        form.onsubmit = function (e) {
+            e.preventDefault();
+
+            // Обновляем данные заказа
+            order.user.name = form['name'].value;
+            order.user.email = form['email'].value;
+            order.user.phone = form['phone'].value;
+            order.user.address = form['address'].value;
+            order.comment = form['comment'].value;
+
+            // Сохраняем дату и временной интервал доставки
+            const updatedDeliveryDate = form['delivery-date'].value;
+            const updatedDeliveryTime = form['delivery-time'].options[form['delivery-time'].selectedIndex].text;
+            order.delivery = `${updatedDeliveryDate} ${updatedDeliveryTime}`;
+
+            // Обновляем localStorage
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const updatedOrders = orders.map(existingOrder =>
+                existingOrder.id === order.id ? order : existingOrder
+            );
+            localStorage.setItem('orders', JSON.stringify(updatedOrders));
+
+            closeModal(modalId);
+            renderOrders();
+
+            // Показываем уведомление об успешном редактировании
+            const notification = document.getElementById('notification');
+            notification.style.display = 'block';
+
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        };
+    }
+
+
+
+    if (modalId === 'delete-modal') {
+        // В модальном окне "Удаление" присваиваем функцию для удаления заказа
+        document.querySelector("#delete-modal button:last-child").onclick = function() {
+            confirmDelete(order.id);
+        };
+    }
+}
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    function confirmDelete(orderId) {
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+        orders = orders.filter(order => order.id !== orderId);
+        localStorage.setItem('orders', JSON.stringify(orders));
+        renderOrders();
+        closeModal('delete-modal');
+    }
+
+    renderOrders();
+    </script>
+</body>
+</html>
